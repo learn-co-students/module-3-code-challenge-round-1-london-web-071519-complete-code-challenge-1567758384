@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('%c DOM Content Loaded and Parsed!', 'color: magenta')
   init()
 })
-const init = () => getData().then(renderPage)
+const init = () => getData().then(renderPage).then(delEvents)
 
 const imageId = 3388 // Enter the id from the fetched image here
 const imageURL = `https://randopic.herokuapp.com/images/${imageId}`
@@ -38,4 +38,36 @@ const addLikes = () => fetch(likeURL, {
   body: JSON.stringify({
     image_id: imageId
   })
-}).then(response => response.json()).then(init())
+})
+  .then(response => response.json()).then(init())
+
+formEl.addEventListener('submit', (ev) => {
+  ev.preventDefault()
+  addComment(ev.target.comment.value)
+})
+
+const addComment = (comment) => fetch(commentsURL, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
+  },
+  body: JSON.stringify({
+    image_id: imageId,
+    content: comment
+  })
+})
+  .then(response => response.json()).then(init())
+
+const delEvents = () => document.querySelectorAll('li button').forEach(btn => btn.addEventListener('click', (ev) => {
+  delComment(ev.target.dataset.id)
+  ev.target.parentNode.remove()
+}))
+
+const delComment = (commentId) => fetch(commentsURL + commentId, {
+  method: 'DELETE',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
+  }
+})
