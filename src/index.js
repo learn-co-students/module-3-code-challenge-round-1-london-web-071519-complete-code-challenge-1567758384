@@ -1,12 +1,41 @@
 document.addEventListener('DOMContentLoaded', () => {
   console.log('%c DOM Content Loaded and Parsed!', 'color: magenta')
-
-  let imageId = 1 //Enter the id from the fetched image here
-
-  const imageURL = `https://randopic.herokuapp.com/images/${imageId}`
-
-  const likeURL = `https://randopic.herokuapp.com/likes/`
-
-  const commentsURL = `https://randopic.herokuapp.com/comments/`
-
+  init()
 })
+const init = () => getData().then(renderPage)
+
+const imageId = 3388 // Enter the id from the fetched image here
+const imageURL = `https://randopic.herokuapp.com/images/${imageId}`
+const likeURL = 'https://randopic.herokuapp.com/likes/'
+const commentsURL = 'https://randopic.herokuapp.com/comments/'
+
+const imageEl = document.querySelector('img')
+const nameEl = document.querySelector('h4#name')
+const likesEl = document.querySelector('span#likes')
+const likeBtn = document.querySelector('button#like_button')
+const formEl = document.querySelector('form#comment_form')
+const commentsEl = document.querySelector('ul#comments')
+
+// const renderPage
+
+const getData = () => fetch(imageURL).then(response => response.json())
+
+const renderPage = (data) => {
+  imageEl.src = data.url
+  nameEl.innerText = data.name
+  likesEl.innerText = data.like_count
+  commentsEl.innerHTML = data.comments.map(comment => `<li>${comment.content + ' '}<button id="del-btn">x</button></li>`).join('')
+}
+
+likeBtn.addEventListener('click', (ev) => addLikes())
+
+const addLikes = () => fetch(likeURL, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json'
+  },
+  body: JSON.stringify({
+    image_id: imageId
+  })
+}).then(response => response.json()).then(init())
