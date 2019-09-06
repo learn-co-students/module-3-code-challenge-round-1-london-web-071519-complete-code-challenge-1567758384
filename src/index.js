@@ -24,40 +24,44 @@ const renderPage = (data) => {
   imageEl.src = data.url
   nameEl.innerText = data.name
   likesEl.innerText = data.like_count
-  commentsEl.innerHTML = data.comments.map(comment => `<li>${comment.content + ' '}<button id="del-btn">x</button></li>`).join('')
+  commentsEl.innerHTML = data.comments.map(comment => `<li>${comment.content + ' '}<button id="del-btn" data-id="${comment.id}">x</button></li>`).join('')
 }
 
 likeBtn.addEventListener('click', (ev) => addLikes())
 
-const addLikes = () => fetch(likeURL, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json'
-  },
-  body: JSON.stringify({
-    image_id: imageId
+const addLikes = () => {
+  return fetch(likeURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({
+      image_id: imageId
+    })
   })
-})
-  .then(response => response.json()).then(init())
+    .then(response => response.json()).then(init)
+}
 
 formEl.addEventListener('submit', (ev) => {
   ev.preventDefault()
   addComment(ev.target.comment.value)
 })
 
-const addComment = (comment) => fetch(commentsURL, {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    Accept: 'application/json'
-  },
-  body: JSON.stringify({
-    image_id: imageId,
-    content: comment
+const addComment = (comment) => {
+  return fetch(commentsURL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json'
+    },
+    body: JSON.stringify({
+      image_id: imageId,
+      content: comment
+    })
   })
-})
-  .then(response => response.json()).then(init())
+    .then(response => response.json()).then(init)
+}
 
 const delEvents = () => document.querySelectorAll('li button').forEach(btn => btn.addEventListener('click', (ev) => {
   delComment(ev.target.dataset.id)
